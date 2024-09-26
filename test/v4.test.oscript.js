@@ -230,6 +230,7 @@ describe('Check v4 upgrade', function () {
 	
 
 	it('Activate the new OPs', async () => {
+		const balance_before = (await this.alice.getBalance()).base.total
 		const { unit, error } = await this.alice.sendMulti({
 			messages: [{
 				app: 'system_vote_count',
@@ -242,6 +243,8 @@ describe('Check v4 upgrade', function () {
 
 		const { unitObj } = await this.alice.getUnitInfo({ unit: unit })
 		console.log(unitObj)
+		const balance_after = (await this.alice.getBalance()).base.total
+		expect(balance_after).to.be.eq(balance_before - 1e9 - unitObj.headers_commission - unitObj.payload_commission - unitObj.tps_fee);
 		await this.network.witnessUntilStable(unit)
 		this.network.initialWitnesses = this.newOpAddresses
 		this.network.nodes.witnesses = this.new_witnesses
@@ -250,6 +253,7 @@ describe('Check v4 upgrade', function () {
 
 	it('Activate the new base tps fee', async () => {
 		await this.timetravel('1s')
+		const balance_before = (await this.alice.getBalance()).base.total
 		const { unit, error } = await this.alice.sendMulti({
 			messages: [{
 				app: 'system_vote_count',
@@ -262,6 +266,8 @@ describe('Check v4 upgrade', function () {
 
 		const { unitObj } = await this.alice.getUnitInfo({ unit: unit })
 		console.log(unitObj)
+		const balance_after = (await this.alice.getBalance()).base.total
+		expect(balance_after).to.be.eq(balance_before - 1e9 - unitObj.headers_commission - unitObj.payload_commission - unitObj.tps_fee);
 		await this.network.witnessUntilStable(unit)
 	})
 
@@ -367,6 +373,7 @@ describe('Check v4 upgrade', function () {
 	
 	it('Activate the new OPs in emergency', async () => {
 		await this.timetravel('2h') // EMERGENCY_COUNT_MIN_VOTE_AGE = 1h
+		const balance_before = (await this.alice.getBalance()).base.total
 		const { unit, error } = await this.alice.sendMulti({
 			messages: [{
 				app: 'system_vote_count',
@@ -383,6 +390,8 @@ describe('Check v4 upgrade', function () {
 
 		const { unitObj } = await this.alice.getUnitInfo({ unit: unit })
 		console.log(unitObj)
+		const balance_after = (await this.alice.getBalance()).base.total
+		expect(balance_after).to.be.eq(balance_before - 1e9 - unitObj.headers_commission - unitObj.payload_commission - unitObj.tps_fee);
 		await this.network.witnessUntilStable(unit)
 	})
 
