@@ -191,7 +191,10 @@ describe('Check v4 upgrade', function () {
 
 
 	it('Vote for new OPs', async () => {
+		const burn_fee = 1e6
+		const balance_before = (await this.alice.getBalance()).base.total
 		const { unit, error } = await this.alice.sendMulti({
+			burn_fee,
 			messages: [{
 				app: 'system_vote',
 				payload: {
@@ -206,6 +209,8 @@ describe('Check v4 upgrade', function () {
 
 		const { unitObj } = await this.alice.getUnitInfo({ unit: unit })
 	//	console.log(unitObj)
+		const balance_after = (await this.alice.getBalance()).base.total
+		expect(balance_after).to.be.eq(balance_before - burn_fee - unitObj.headers_commission - unitObj.payload_commission - unitObj.tps_fee);
 		await this.network.witnessUntilStable(unit)
 	})
 	
